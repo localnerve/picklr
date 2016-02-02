@@ -1,5 +1,9 @@
 # Pickle
 
+[![Build Status](https://secure.travis-ci.org/localnerve/pickle.svg?branch=master)](http://travis-ci.org/localnerve/pickle)
+[![Coverage Status](https://coveralls.io/repos/localnerve/pickle/badge.svg?branch=master)](https://coveralls.io/r/localnerve/pickle?branch=master)
+[![devDependency Status](https://david-dm.org/localnerve/pickle/dev-status.svg)](https://david-dm.org/localnerve/pickle#info=devDependencies)
+
 > "`pick` `l`in`e`"
 >
 > A simple, zero dependency, recursive, single-line text replacer for NodeJS.
