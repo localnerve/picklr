@@ -4,11 +4,12 @@
 >
 > A simple, zero dependency, recursive, single-line text replacer for NodeJS.
 
-Use to update a specific line of text across multiple file types in a project.
+Use to update a specific, single line of text across multiple file types in a project.
 Finds just the **first** matching line in a file, and runs a text replacement on just that one line.
+Synchronous processing.
 
 You might be reading this because you're in a pickle. :-)
-This allows you to run test actions `echo` and `audit` to see what would happen prior to any file being updated.
+It allows you to test behavior prior to any updates with actions `echo` and `audit`. It's good to see what would happen prior to any file being updated, and also what files get omitted from the change set.
 
 ## API
 Pickle exports a single function that starts synchronous file processing when invoked.
@@ -33,29 +34,36 @@ A brief description of the options that control file selection and processing:
 // Example use for a copyright banner text update:
 var pickle = require('pickle');
 
-// Log what files WOULD be affected by includes/excludes:
+// Output what files WOULD be affected by includes/excludes:
 pickle('.', {
   action: 'echo',
   includeExts: ['.js', '.jsx', '.scss'],
-  excludeDirsRe: /\.|node_modules|dist|tmp|reports/i
+  excludeDirsRe: /\/\.|node_modules|dist|tmp|reports/i
 });
 
-// Log what WOULD be processed using targetText:
+// Output what WOULD be processed using targetText/replacementText:
 pickle('.', {
   action: 'audit',
   targetText: 'Copyright (c) 2015',
+  replacementText: 'Copyright (c) 2015, 2016',
   includeExts: ['.js', '.jsx', '.scss'],
-  excludeDirsRe: /\.|node_modules|dist|tmp|reports/i
+  excludeDirsRe: /\/\.|node_modules|dist|tmp|reports/i
 });
 
-// Actually perform the pick/replacement.
+// Actually perform a pick and replacement.
 pickle('.', {
   action: 'update',
   targetText: 'Copyright (c) 2015',
   replacementText: 'Copyright (c) 2015, 2016',
   includeExts: ['.js', '.jsx', '.scss'],
-  excludeDirsRe: /\.|node_modules|dist|tmp|reports/i
+  excludeDirsRe: /\/\.|node_modules|dist|tmp|reports/i
 });
+```
+
+### Omitted
+To see only what files would be omitted, set your pickle script to use action 'audit'.
+```shell
+node myPickleScript.js | grep 'Omitted'
 ```
 
 ## License
