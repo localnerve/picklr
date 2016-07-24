@@ -1,6 +1,6 @@
 {
   "name": "pickle",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "A utility to update a single line in multiple files",
   "main": "index.js",
   "scripts": {
@@ -39,7 +39,7 @@
   },
   "pre-commit": [
     "lint",
-    "devtest"
+    "test"
   ],
   "engines": {
     "node": ">= 4"
