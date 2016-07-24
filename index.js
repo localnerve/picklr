@@ -7,4 +7,4 @@
 /* global require, module */
 'use strict';
 
-module.exports = require('./lib/pickle');
+module.exports = require('./lib/picklr');

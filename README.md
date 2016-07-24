@@ -1,30 +1,31 @@
-# Pickle
+# Picklr
 
-[![Build Status](https://secure.travis-ci.org/localnerve/pickle.svg?branch=master)](http://travis-ci.org/localnerve/pickle)
-[![Coverage Status](https://coveralls.io/repos/localnerve/pickle/badge.svg?branch=master)](https://coveralls.io/r/localnerve/pickle?branch=master)
-[![devDependency Status](https://david-dm.org/localnerve/pickle/dev-status.svg)](https://david-dm.org/localnerve/pickle#info=devDependencies)
+[![npm version](https://badge.fury.io/js/picklr.svg)](http://badge.fury.io/js/picklr)
+[![Build Status](https://secure.travis-ci.org/localnerve/picklr.svg?branch=master)](http://travis-ci.org/localnerve/picklr)
+[![Coverage Status](https://coveralls.io/repos/localnerve/picklr/badge.svg?branch=master)](https://coveralls.io/r/localnerve/picklr?branch=master)
+[![Dependency Status](https://david-dm.org/localnerve/picklr.svg)](https://david-dm.org/localnerve/picklr)
+[![devDependency Status](https://david-dm.org/localnerve/picklr/dev-status.svg)](https://david-dm.org/localnerve/picklr#info=devDependencies)
 
-> "`pick` `l`in`e`"
+> "`Pick` `l`ine & `r`eplace"
 >
-> A simple, zero dependency, recursive, single-line text replacer for NodeJS.
+> A simple, zero dependency, recursive, single-line text replacer for NodeJS >= 4.
 
 Use to update a specific, single line of text across multiple file types in a project.
 Finds just the **first** matching line in a file, and runs a text replacement on just that one line.
 Synchronous processing.
 
-You might be reading this because you're in a pickle. :-)
-It allows you to test behavior prior to any updates with actions `echo` and `audit`. It's good to see what would happen prior to any file being updated, and also what files get omitted from the change set.
+You might be reading this because you're in a pickle where you have to change a line across a big project. No worries, picklr allows you to test behavior prior to any updates with actions `echo` and `audit`. It's good to see what would happen prior to any file being updated, and also what files will get omitted from the change set.
 
 ## API
-Pickle exports a single function that starts synchronous file processing when invoked.
+Picklr exports a single function that starts synchronous file processing when invoked.
 
 `function (startDir, options)`
 
 ### Options
 A brief description of the options that control file selection and processing:
-  + `action` - {String} `echo|audit|update` The action taken on each file. Defaults to `echo`. Use `echo` and `audit` actions to test the results of pickle with options prior to running `update`.
-    + `echo` - Just output what files could be affected by a change. Tests `includeExts` and `excludeDirsRe`.
-    + `audit` - Must use with `targetText` and `replacementText`. Outputs lines found and the change plus any files that would be omitted. Tests `includeExts`, `excludeDirsRe`, `targetText` and `replacementText`.
+  + `action` - {String} `echo|audit|update` The action taken on each file. Defaults to `echo`. Use `echo` and `audit` actions to test the results of picklr with options prior to running `update`.
+    + `echo` - Just output what files could be affected by a change. Tests `includeExts` and `excludeDirsRe` options.
+    + `audit` - Must use with `targetText` and `replacementText`. Outputs lines found and the change plus any files that would be omitted. Tests `includeExts`, `excludeDirsRe`, `targetText` and `replacementText` options.
     + `update` - Does the actual update on the files in place. Use only if you have version control.
   + `includeExts` - {Array} File extensions used to include files in processing. Must include the dot.
   + `excludeDirsRe` - {RegExp} A regular expression used to exclude directories from processing. A match is an exclusion.
@@ -36,17 +37,17 @@ A brief description of the options that control file selection and processing:
 ## Example Usage
 ```javascript
 // Example use for a copyright banner text update:
-var pickle = require('pickle');
+const picklr = require('picklr');
 
 // Output what files WOULD be affected by includes/excludes:
-pickle('.', {
+picklr('.', {
   action: 'echo',
   includeExts: ['.js', '.jsx', '.scss'],
   excludeDirsRe: /\/\.|node_modules|dist|tmp|reports/i
 });
 
 // Output what WOULD be processed using targetText/replacementText:
-pickle('.', {
+picklr('.', {
   action: 'audit',
   targetText: 'Copyright (c) 2015',
   replacementText: 'Copyright (c) 2015, 2016',
@@ -54,8 +55,8 @@ pickle('.', {
   excludeDirsRe: /\/\.|node_modules|dist|tmp|reports/i
 });
 
-// Actually perform a pick and replacement.
-pickle('.', {
+// Got it. Now, actually perform the pick line and replacement.
+picklr('.', {
   action: 'update',
   targetText: 'Copyright (c) 2015',
   replacementText: 'Copyright (c) 2015, 2016',
@@ -65,9 +66,21 @@ pickle('.', {
 ```
 
 ### Omitted
-To see only what files would be omitted, set your pickle script to use action 'audit'.
+To see only what files would be omitted, set your picklr script to use action 'audit', then grep the output for 'Omitted'.
+```javascript
+// myPicklrScript.js
+
+const picklr = require('picklr');
+picklr('.', {
+  action: 'audit',
+  targetText: 'Copyright (c) 2015',
+  replacementText: 'Copyright (c) 2015, 2016',
+  includeExts: ['.js', '.jsx', '.scss'],
+  excludeDirsRe: /\/\.|node_modules|dist|tmp|reports/i
+});
+```
 ```shell
-node myPickleScript.js | grep 'Omitted'
+node myPicklrScript.js | grep 'Omitted'
 ```
 
 ## License

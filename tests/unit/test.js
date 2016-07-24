@@ -8,27 +8,27 @@
 /* eslint-disable no-console */
 'use strict';
 
-var expect = require('chai').expect;
-var spawn = require('child_process').spawn;
-var path = require('path');
-var rimraf = require('rimraf');
-var fs = require('fs');
-var pickle = require('../../lib/pickle');
+const expect = require('chai').expect;
+const spawn = require('child_process').spawn;
+const path = require('path');
+const rimraf = require('rimraf');
+const fs = require('fs');
+const picklr = require('../../lib/picklr');
 
-describe('pickle', function () {
-  var startDir = path.join(__dirname, '../fixtures');
-  var totalCount,
-      matchedCount,
-      foundText,
-      replaceText,
-      omitText,
-      updateText,
-      totalJSFiles = 7,
-      totalSCSSFiles = 11,
-      totalJSXFiles = 22;
+describe('picklr', () => {
+  const startDir = path.join(__dirname, '../fixtures'),
+    totalJSFiles = 7,
+    totalSCSSFiles = 11,
+    totalJSXFiles = 22;
+  let totalCount,
+    matchedCount,
+    foundText,
+    replaceText,
+    omitText,
+    updateText;
 
   function getCounts (text) {
-    var m;
+    let m;
     if (text.indexOf('Matched file count') > -1) {
       m = text.match(/Matched.+=\s*(\d+)/i);
       matchedCount = parseInt(m && m[1] || 0, 10);
@@ -40,7 +40,7 @@ describe('pickle', function () {
   }
 
   function getAudits (text) {
-    var m;
+    let m;
     if (text.indexOf('@@@') === 0) {
       m = text.match(/\@\@\@\s*Found\:\s*(.+)/i);
       if (m && m[1]) {
@@ -62,7 +62,7 @@ describe('pickle', function () {
   }
 
   function getUpdates (text) {
-    var m;
+    let m;
     if (text.indexOf('@@@') === 0) {
       m = text.match(/\@\@\@\s*Updated:\s*(.+)/i);
       if (m && m[1]) {
@@ -71,7 +71,7 @@ describe('pickle', function () {
     }
   }
 
-  beforeEach(function () {
+  beforeEach(() => {
     foundText = [];
     replaceText = [];
     omitText = [];
@@ -80,18 +80,18 @@ describe('pickle', function () {
     totalCount = 0;
   });
 
-  describe('echo', function () {
-    it('should echo js test files by default', function () {
-      pickle(startDir, {
+  describe('echo', () => {
+    it('should echo js test files by default', () => {
+      picklr(startDir, {
         logger: getCounts
       });
 
       expect(totalCount).to.equal(totalJSFiles);
     });
 
-    describe('includeExts', function () {
-      it('should count only scss files', function () {
-        pickle(startDir, {
+    describe('includeExts', () => {
+      it('should count only scss files', () => {
+        picklr(startDir, {
           includeExts: ['.scss'],
           logger: getCounts
         });
@@ -99,8 +99,8 @@ describe('pickle', function () {
         expect(totalCount).to.equal(totalSCSSFiles);
       });
 
-      it('should count only jsx and scss files', function () {
-        pickle(startDir, {
+      it('should count only jsx and scss files', () => {
+        picklr(startDir, {
           includeExts: ['.jsx', '.scss'],
           logger: getCounts
         });
@@ -108,8 +108,8 @@ describe('pickle', function () {
         expect(totalCount).to.equal(totalJSXFiles + totalSCSSFiles);
       });
 
-      it('should count all fixture files', function () {
-        pickle(startDir, {
+      it('should count all fixture files', () => {
+        picklr(startDir, {
           includeExts: ['.js', '.jsx', '.scss'],
           logger: getCounts
         });
@@ -118,11 +118,11 @@ describe('pickle', function () {
       });
     });
 
-    describe('excludeDirsRe', function () {
-      var totalJSFilesWoWorkit = totalJSFiles - 2;
+    describe('excludeDirsRe', () => {
+      const totalJSFilesWoWorkit = totalJSFiles - 2;
 
-      it('should exclude directories', function () {
-        pickle(startDir, {
+      it('should exclude directories', () => {
+        picklr(startDir, {
           includeExts: ['.js'],
           excludeDirsRe: /\/\.|workit/i,
           logger: getCounts
@@ -131,8 +131,8 @@ describe('pickle', function () {
         expect(totalCount).to.equal(totalJSFilesWoWorkit);
       });
 
-      it('should exclude a directory recursively', function () {
-        pickle(startDir, {
+      it('should exclude a directory recursively', () => {
+        picklr(startDir, {
           includeExts: ['.js'],
           excludeDirsRe: /\/\.|1/i,
           logger: getCounts
@@ -141,8 +141,8 @@ describe('pickle', function () {
         expect(totalCount).to.equal(3);
       });
 
-      it('should exclude multiple directories', function () {
-        pickle(startDir, {
+      it('should exclude multiple directories', () => {
+        picklr(startDir, {
           includeExts: ['.js'],
           excludeDirsRe: /\/\.|1|2|workit/i,
           logger: getCounts
@@ -153,14 +153,14 @@ describe('pickle', function () {
     });
   });
 
-  describe('audit', function () {
-    var workit = path.join(startDir, 'files', 'workit');
-    var backup = path.join(startDir, 'files', 'workitbackup');
+  describe('audit', () => {
+    const workit = path.join(startDir, 'files', 'workit');
+    const backup = path.join(startDir, 'files', 'workitbackup');
 
-    before('audit', function (done) {
-      var cp = spawn('cp', ['-r', workit, backup]);
-      cp.on('close', function (code) {
-        var exists = false, stats;
+    before('audit', (done) => {
+      const cp = spawn('cp', ['-r', workit, backup]);
+      cp.on('close', (code) => {
+        let exists = false, stats;
         if (code === 0) {
           stats = fs.statSync(backup);
           exists = stats && stats.isDirectory();
@@ -169,12 +169,12 @@ describe('pickle', function () {
       });
     });
 
-    after('audit', function (done) {
+    after('audit', (done) => {
       rimraf(backup, done);
     });
 
-    it('should not update files', function () {
-      pickle(workit, {
+    it('should not update files', () => {
+      picklr(workit, {
         action: 'audit',
         targetText: 'this is a test',
         includeExts: ['.txt'],
@@ -184,15 +184,15 @@ describe('pickle', function () {
       expect(totalCount).to.equal(1);
       expect(matchedCount).to.equal(1);
 
-      var auditedFile =
+      const auditedFile =
         fs.readFileSync(path.join(workit, 'sentinel.txt'), {encoding: 'utf8'});
-      var cleanFile =
+      const cleanFile =
         fs.readFileSync(path.join(backup, 'sentinel.txt'), {encoding: 'utf8'});
       expect(auditedFile).to.equal(cleanFile);
     });
 
-    it('should report the proposed update', function () {
-      pickle(workit, {
+    it('should report the proposed update', () => {
+      picklr(workit, {
         action: 'audit',
         targetText: '88888888',
         replacementText: '9',
@@ -206,8 +206,8 @@ describe('pickle', function () {
       expect(replaceText[0]).to.contain('9').and.not.contain('8');
     });
 
-    it('should report omitted files', function () {
-      pickle(workit, {
+    it('should report omitted files', () => {
+      picklr(workit, {
         action: 'audit',
         targetText: '88888888',
         replacementText: '9',
@@ -225,14 +225,14 @@ describe('pickle', function () {
     });
   });
 
-  describe('update', function () {
-    var workit = path.join(startDir, 'files', 'workit');
-    var update = path.join(startDir, 'files', 'workitupdate');
+  describe('update', () => {
+    const workit = path.join(startDir, 'files', 'workit');
+    const update = path.join(startDir, 'files', 'workitupdate');
 
-    before('update', function (done) {
-      var cp = spawn('cp', ['-r', workit, update]);
-      cp.on('close', function (code) {
-        var exists = false, stats;
+    before('update', (done) => {
+      const cp = spawn('cp', ['-r', workit, update]);
+      cp.on('close', (code) => {
+        let exists = false, stats;
         if (code === 0) {
           stats = fs.statSync(update);
           exists = stats && stats.isDirectory();
@@ -241,12 +241,14 @@ describe('pickle', function () {
       });
     });
 
-    after('update', function (done) {
+    after('update', (done) => {
       rimraf(update, done);
     });
 
-    it('should update only the found file', function () {
-      pickle(update, {
+    it('should update only the found file', () => {
+      let cleanFile, shouldBeCleanFile;
+
+      picklr(update, {
         action: 'update',
         targetText: '88888888',
         replacementText: '9',
@@ -258,15 +260,15 @@ describe('pickle', function () {
       expect(updateText.length).to.equal(1);
       expect(updateText[0]).to.contain('.txt').and.not.contain('.scss');
 
-      var cleanFile =
+      cleanFile =
         fs.readFileSync(path.join(workit, '_app.scss'), {encoding: 'utf8'});
-      var shouldBeCleanFile =
+      shouldBeCleanFile =
         fs.readFileSync(path.join(update, '_app.scss'), {encoding: 'utf8'});
       expect(cleanFile).to.equal(shouldBeCleanFile);
 
       cleanFile =
         fs.readFileSync(path.join(workit, 'sentinel.txt'), {encoding: 'utf8'});
-      var updatedFile =
+      const updatedFile =
         fs.readFileSync(path.join(update, 'sentinel.txt'), {encoding: 'utf8'});
       expect(cleanFile).to.not.equal(updatedFile);
       expect(updatedFile).to.contain('9').and.not.contain('8');

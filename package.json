@@ -1,12 +1,13 @@
 {
   "name": "pickle",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "A utility to update a single line in multiple files",
   "main": "index.js",
   "scripts": {
     "lint": "eslint **/*.js --ignore-path .gitignore",
-    "devtest": "mocha tests/unit --recursive --reporter spec",
-    "test": "istanbul cover --dir ${COVERAGE_DIR:-reports/coverage} -- _mocha tests/unit/* --recursive --reporter spec"
+    "test": "mocha tests/unit --recursive --reporter spec",
+    "cover": "istanbul cover --dir ${COVERAGE_DIR:-reports/coverage} -- _mocha tests/unit/* --recursive --reporter spec",
+    "validate": "npm ls"
   },
   "repository": {
     "type": "git",
@@ -30,7 +31,7 @@
     "chai": "^3.5.0",
     "coveralls": "^2.11.6",
     "eslint": "^1.10.3",
-    "eslint-config-defaults": "^8.0.2",
+    "babel-eslint": "^6.1.2",
     "istanbul": "^0.4.2",
     "mocha": "^2.4.5",
     "precommit-hook": "^3.0.0",
@@ -39,5 +40,8 @@
   "pre-commit": [
     "lint",
     "devtest"
-  ]
+  ],
+  "engines": {
+    "node": ">= 4"
+  }
 }
