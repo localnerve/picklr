@@ -1,6 +1,6 @@
 {
   "name": "picklr",
-  "version": "0.2.4",
+  "version": "0.2.5",
   "description": "A utility to update a single line in multiple files",
   "main": "index.js",
   "scripts": {
@@ -14,12 +14,13 @@
     "url": "git+https://github.com/localnerve/picklr.git"
   },
   "keywords": [
-    "copyright",
+    "pick",
+    "line",
+    "replace",
     "multiple",
     "file",
-    "line",
-    "updater",
-    "text"
+    "text",
+    "copyright"
   ],
   "author": "Alex Grant (@localnerve)",
   "license": "MIT",
