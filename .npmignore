@@ -1,0 +1,6 @@
+.DS_Store
+.coveralls.yml
+.travis.yml
+reports
+tmp
+.jshint*
