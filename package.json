@@ -1,6 +1,6 @@
 {
   "name": "picklr",
-  "version": "0.2.7",
+  "version": "0.2.8",
   "description": "A utility to update a single line in multiple files",
   "main": "index.js",
   "scripts": {
