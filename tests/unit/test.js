@@ -1,5 +1,5 @@
 /***
- * Copyright (c) 2015 - 2018 Alex Grant (@localnerve), LocalNerve LLC
+ * Copyright (c) 2015 - 2019 Alex Grant (@localnerve), LocalNerve LLC
  * Licensed under the MIT license.
  *
  * tests.
