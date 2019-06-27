@@ -4,7 +4,5 @@
  *
  * Expose the library.
  */
-/* global require, module */
-'use strict';
 
 module.exports = require('./lib/picklr');
