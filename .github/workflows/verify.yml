@@ -26,4 +26,7 @@ jobs:
       run: npm run lint && npm run cover
     - name: Coverage Upload
       if: ${{ success() }}
-      run: cat reports/coverage/lcov.info | ./node_modules/.bin/coveralls
+      uses: coverallsapp/github-action@master
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        path-to-lcov: ./reports/coverage/lcov.info
