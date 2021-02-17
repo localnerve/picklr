@@ -4,10 +4,8 @@
  *
  * tests.
  */
-/* global require, describe, it, after, before, beforeEach */
+/* global describe, it, after, before, beforeEach */
 /* eslint-disable no-console */
-'use strict';
-
 const expect = require('chai').expect;
 const spawn = require('child_process').spawn;
 const path = require('path');
@@ -18,14 +16,25 @@ const picklr = require('../../lib/picklr');
 describe('picklr', () => {
   const startDir = path.join(__dirname, '../fixtures'),
     totalJSFiles = 7,
-    totalSCSSFiles = 11,
-    totalJSXFiles = 22;
+    totalSCSSFiles = 12,
+    totalJSXFiles = 22,
+    foundLines = [];
   let totalCount,
     matchedCount,
     foundText,
     replaceText,
     omitText,
     updateText;
+
+  function getFoundLines (text) {
+    let m;
+    m = text.match(/(?:File|Updated)\s*\((\d+)[^:]+\s*(.*)$/i);
+    if (m && m.length > 2) {
+      const lines = parseInt(m[1] || 0, 10);
+      const path = m[2];
+      foundLines.push({ lines, path });
+    }
+  }
 
   function getCounts (text) {
     let m;
@@ -37,34 +46,36 @@ describe('picklr', () => {
       m = text.match(/Total.+=\s*(\d+)/i);
       totalCount = parseInt(m && m[1] || 0, 10);
     }
+    getFoundLines(text);
   }
 
   function getAudits (text) {
     let m;
     if (text.indexOf('@@@') === 0) {
-      m = text.match(/\@\@\@\s*Found\:\s*(.+)/i);
+      m = text.match(/@@@\s*Found:\s*(.+)/i);
       if (m && m[1]) {
         foundText.push(m[1]);
       }
     }
     if (text.indexOf('---') === 0) {
-      m = text.match(/\-\-\-\s*Change\:\s*(.+)/i);
+      m = text.match(/---\s*Change:\s*(.+)/i);
       if (m && m[1]) {
         replaceText.push(m[1]);
       }
     }
     if (text.indexOf('***') === 0) {
-      m = text.match(/\*\*\*\s*Omitted\:\s*(.+)/i);
+      m = text.match(/\*\*\*\s*Omitted:\s*(.+)/i);
       if (m && m[1]) {
         omitText.push(m[1]);
       }
     }
+    getFoundLines(text);
   }
 
   function getUpdates (text) {
     let m;
     if (text.indexOf('@@@') === 0) {
-      m = text.match(/\@\@\@\s*Updated:\s*(.+)/i);
+      m = text.match(/@@@\s*Updated[^:]+:\s*(.+)/i);
       if (m && m[1]) {
         updateText.push(m[1]);
       }
@@ -76,6 +87,7 @@ describe('picklr', () => {
     replaceText = [];
     omitText = [];
     updateText = [];
+    foundLines.length = 0;
     matchedCount = 0;
     totalCount = 0;
   });
@@ -218,10 +230,29 @@ describe('picklr', () => {
 
       expect(foundText.length).to.equal(1);
       expect(replaceText.length).to.equal(1);
-      expect(omitText.length).to.equal(1);
+      expect(omitText.length).to.equal(2); // 2 scss files without 88888888
       expect(foundText[0]).to.contain('88888888');
       expect(replaceText[0]).to.contain('9').and.not.contain('8');
       expect(omitText[0]).to.contain('.scss');
+    });
+
+    it('should handle multiple line updates', () => {
+      picklr(workit, {
+        action: 'audit',
+        targetText: '2021',
+        replacementText: '2022',
+        includeExts: ['.scss'],
+        excludeDirsRe: /1|2/,
+        logger: getAudits
+      });
+
+      const expected = { '_app.scss': 1, '_multi.scss': 4 };
+      expect(foundLines.length).to.equal(2); // two scss files
+      foundLines.forEach(foundLine => {
+        const file = path.parse(foundLine.path).base;
+        const expectedLines = expected[file];
+        expect(expectedLines).to.equal(foundLine.lines);
+      });
     });
   });
 
@@ -272,6 +303,38 @@ describe('picklr', () => {
         fs.readFileSync(path.join(update, 'sentinel.txt'), {encoding: 'utf8'});
       expect(cleanFile).to.not.equal(updatedFile);
       expect(updatedFile).to.contain('9').and.not.contain('8');
+    });
+
+    it('should update multiple lines if found', () => {
+      picklr(update, {
+        action: 'update',
+        targetText: '2021',
+        replacementText: '2022',
+        includeExts: ['.scss'],
+        excludeDirsRe: /1|2/,
+        logger: getUpdates
+      });
+
+      expect(updateText.length).to.equal(2); // _app.scss and _multi.scss
+      expect(updateText[0]).to.contain('.scss');
+
+      function checkLineDiffs (file, expectedDiffs) {
+        let diffLineCount = 0;
+        const cleanFileLines =
+          fs.readFileSync(path.join(workit, file), {encoding: 'utf8'}).split('\n');
+        const updatedFileLines =
+          fs.readFileSync(path.join(update, file), {encoding: 'utf8'}).split('\n');
+        expect(cleanFileLines.length).to.equal(updatedFileLines.length);
+        cleanFileLines.forEach((cleanLine, i) => {
+          if (cleanLine !== updatedFileLines[i]) {
+            diffLineCount++;
+          }
+        });
+        expect(diffLineCount).to.equal(expectedDiffs);
+      }
+
+      checkLineDiffs('_app.scss', 1);
+      checkLineDiffs('_multi.scss', 4);
     });
   });
 });
