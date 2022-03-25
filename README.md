@@ -1,12 +1,8 @@
 # Picklr
 
-
-
 [![npm version](https://badge.fury.io/js/picklr.svg)](http://badge.fury.io/js/picklr)
 ![Verify](https://github.com/localnerve/picklr/workflows/Verify/badge.svg)
 [![Coverage Status](https://coveralls.io/repos/localnerve/picklr/badge.svg?branch=master)](https://coveralls.io/r/localnerve/picklr?branch=master)
-[![Dependency Status](https://david-dm.org/localnerve/picklr.svg)](https://david-dm.org/localnerve/picklr)
-[![devDependency Status](https://david-dm.org/localnerve/picklr/dev-status.svg)](https://david-dm.org/localnerve/picklr#info=devDependencies)
 
 > "`Pick` `l`ine & `r`eplace"
 >
