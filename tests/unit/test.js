@@ -1,5 +1,5 @@
 /***
- * Copyright (c) 2015 - 2021 Alex Grant (@localnerve), LocalNerve LLC
+ * Copyright (c) 2015 - 2022 Alex Grant (@localnerve), LocalNerve LLC
  * Licensed under the MIT license.
  *
  * tests.
@@ -239,8 +239,8 @@ describe('picklr', () => {
     it('should handle multiple line updates', () => {
       picklr(workit, {
         action: 'audit',
-        targetText: '2021',
-        replacementText: '2022',
+        targetText: '39393939',
+        replacementText: '40404040',
         includeExts: ['.scss'],
         excludeDirsRe: /1|2/,
         logger: getAudits
@@ -308,8 +308,8 @@ describe('picklr', () => {
     it('should update multiple lines if found', () => {
       picklr(update, {
         action: 'update',
-        targetText: '2021',
-        replacementText: '2022',
+        targetText: '39393939',
+        replacementText: '40404040',
         includeExts: ['.scss'],
         excludeDirsRe: /1|2/,
         logger: getUpdates
