@@ -5,4 +5,4 @@
  * Expose the library.
  */
 
-export { default, default as picklr } from './lib/picklr';
+export { default, default as picklr } from './lib/picklr.js';
