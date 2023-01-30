@@ -1,8 +1,8 @@
 /***
- * Copyright (c) 2015 - 2022 Alex Grant (@localnerve), LocalNerve LLC
+ * Copyright (c) 2015 - 2023 Alex Grant (@localnerve), LocalNerve LLC
  * Licensed under the MIT license.
  *
  * Expose the library.
  */
 
-module.exports = require('./lib/picklr');
+export default './lib/picklr';
