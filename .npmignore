@@ -1,6 +1,6 @@
 .DS_Store
-.coveralls.yml
-.travis.yml
+.github
 reports
 tmp
+tests
 .jshint*

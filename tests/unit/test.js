@@ -1,17 +1,19 @@
 /***
- * Copyright (c) 2015 - 2022 Alex Grant (@localnerve), LocalNerve LLC
+ * Copyright (c) 2015 - 2023 Alex Grant (@localnerve), LocalNerve LLC
  * Licensed under the MIT license.
  *
  * tests.
  */
-/* global describe, it, after, before, beforeEach */
+/* eslint-env node, mocha */
 /* eslint-disable no-console */
-const expect = require('chai').expect;
-const spawn = require('child_process').spawn;
-const path = require('path');
-const rimraf = require('rimraf');
-const fs = require('fs');
-const picklr = require('../../lib/picklr');
+import { expect } from 'chai';
+import { spawn } from 'child_process';
+import { default as path, dirname } from 'path';
+import { fileURLToPath } from 'url';
+import fs from 'fs';
+import picklr from '../../lib/picklr.js';
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
 
 describe('picklr', () => {
   const startDir = path.join(__dirname, '../fixtures'),
@@ -182,7 +184,7 @@ describe('picklr', () => {
     });
 
     after('audit', (done) => {
-      rimraf(backup, done);
+      fs.rm(backup, { recursive: true, force: true }, done);
     });
 
     it('should not update files', () => {
@@ -273,7 +275,8 @@ describe('picklr', () => {
     });
 
     after('update', (done) => {
-      rimraf(update, done);
+      fs.rm(update, { recursive: true, force: true }, done);
+
     });
 
     it('should update only the found file', () => {

@@ -6,7 +6,7 @@
 
 > "`Pick` `l`ine & `r`eplace"
 >
-> A simple, zero dependency, recursive, single-line text replacer for NodeJS >= 12.
+> A simple, zero dependency, recursive, single-line text replacer for NodeJS >= 16.
 
 Use to update a specific, single line of text across multiple file types in a project.
 Finds just the **first** matching line in a file, and runs a text replacement on just that one line.
@@ -35,7 +35,7 @@ A brief description of the options that control file selection and processing:
 ## Example Usage
 ```javascript
 // Example use for a copyright banner text update:
-const picklr = require('picklr');
+import picklr from 'picklr';
 
 // Output what files WOULD be affected by includes/excludes:
 picklr('.', {
@@ -63,12 +63,24 @@ picklr('.', {
 });
 ```
 
+### Non-module Usage
+```javascript
+// import the es module in a non-module environment, echo options example:
+import('picklr').then(({ picklr }) => {
+  picklr('.', {
+    action: 'echo',
+    includeExts: ['.js', '.jsx', '.scss'],
+    excludeDirsRe: /\/\.|node_modules|dist|tmp|reports/i
+  });
+});
+```
+
 ### Omitted
 To see only what files would be omitted, set your picklr script to use action 'audit', then grep the output for 'Omitted'.
 ```javascript
 // myPicklrScript.js
 
-const picklr = require('picklr');
+import picklr from 'picklr';
 picklr('.', {
   action: 'audit',
   targetText: 'Copyright (c) 2015',
