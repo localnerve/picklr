@@ -63,6 +63,18 @@ picklr('.', {
 });
 ```
 
+### Non-module Usage
+```javascript
+// import the es module in a non-module environment, echo options example:
+import('picklr').then(({ picklr }) => {
+  picklr('.', {
+    action: 'echo',
+    includeExts: ['.js', '.jsx', '.scss'],
+    excludeDirsRe: /\/\.|node_modules|dist|tmp|reports/i
+  });
+});
+```
+
 ### Omitted
 To see only what files would be omitted, set your picklr script to use action 'audit', then grep the output for 'Omitted'.
 ```javascript
