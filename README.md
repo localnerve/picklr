@@ -6,7 +6,7 @@
 
 > "`Pick` `l`ine & `r`eplace"
 >
-> A simple, zero dependency, recursive, single-line text replacer for NodeJS >= 16.
+> A simple, zero dependency, recursive, single-line text replacer.
 
 Use to update a specific, single line of text across multiple file types in a project.
 Finds just the **first** matching line in a file, and runs a text replacement on just that one line.
