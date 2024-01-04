@@ -29,6 +29,8 @@ A brief description of the options that control file selection and processing:
   + `excludeDirsRe` - {RegExp} A regular expression used to exclude directories from processing. A match is an exclusion.
   + `targetText` - {String} The string used to identify the line to process.
   + `replacementText` - {String} The string used to replace the `targetText`.
+  + `replacementFilter` - {Function} A function to deny a specific replacement otherwise matched by `targetText`. Return true to allow the replacement to proceed as normal, false to deny it. If not supplied, defaults to all matched replacements allowed.  
+    *signature:* **function (filePath, lineText): Boolean**  
   + `logger` - {Function} A log function to receive output. Defaults to `console.log`.
 
 

@@ -1,5 +1,5 @@
 /***
- * Copyright (c) 2015 - 2023 Alex Grant (@localnerve), LocalNerve LLC
+ * Copyright (c) 2015 - 2024 Alex Grant (@localnerve), LocalNerve LLC
  * Licensed under the MIT license.
  *
  * tests.
@@ -82,6 +82,14 @@ describe('picklr', () => {
         updateText.push(m[1]);
       }
     }
+  }
+
+  function replacementFilter (filePath, lineText) {
+    let result = true;
+    if (path.basename(filePath).includes('multi')) {
+      result = !lineText.includes('36363636');
+    }
+    return result;
   }
 
   beforeEach(() => {
@@ -238,22 +246,36 @@ describe('picklr', () => {
       expect(omitText[0]).to.contain('.scss');
     });
 
-    it('should handle multiple line updates', () => {
-      picklr(workit, {
-        action: 'audit',
-        targetText: '39393939',
-        replacementText: '40404040',
-        includeExts: ['.scss'],
-        excludeDirsRe: /1|2/,
-        logger: getAudits
-      });
-
-      const expected = { '_app.scss': 1, '_multi.scss': 4 };
-      expect(foundLines.length).to.equal(2); // two scss files
-      foundLines.forEach(foundLine => {
-        const file = path.parse(foundLine.path).base;
-        const expectedLines = expected[file];
-        expect(expectedLines).to.equal(foundLine.lines);
+    [
+      {
+        description: 'should handle multiple line updates',
+        expected: { '_app.scss': 1, '_multi.scss': 4 },
+        replacementFilter: null
+      },
+      {
+        description: 'should filter multiple line updates',
+        expected: { '_app.scss': 1, '_multi.scss': 3 },
+        replacementFilter
+      }
+    ].forEach(args => {
+      it(args.description, () => {
+        picklr(workit, {
+          action: 'audit',
+          targetText: '39393939',
+          replacementText: '40404040',
+          replacementFilter: args.replacementFilter,
+          includeExts: ['.scss'],
+          excludeDirsRe: /1|2/,
+          logger: getAudits
+        });
+  
+        const expected = args.expected;
+        expect(foundLines.length).to.equal(2); // two scss files
+        foundLines.forEach(foundLine => {
+          const file = path.parse(foundLine.path).base;
+          const expectedLines = expected[file];
+          expect(expectedLines).to.equal(foundLine.lines);
+        });
       });
     });
   });
@@ -262,7 +284,7 @@ describe('picklr', () => {
     const workit = path.join(startDir, 'files', 'workit');
     const update = path.join(startDir, 'files', 'workitupdate');
 
-    before('update', (done) => {
+    beforeEach('update', (done) => {
       const cp = spawn('cp', ['-r', workit, update]);
       cp.on('close', (code) => {
         let exists = false, stats;
@@ -274,9 +296,8 @@ describe('picklr', () => {
       });
     });
 
-    after('update', (done) => {
+    afterEach('update', (done) => {
       fs.rm(update, { recursive: true, force: true }, done);
-
     });
 
     it('should update only the found file', () => {
@@ -308,36 +329,51 @@ describe('picklr', () => {
       expect(updatedFile).to.contain('9').and.not.contain('8');
     });
 
-    it('should update multiple lines if found', () => {
-      picklr(update, {
-        action: 'update',
-        targetText: '39393939',
-        replacementText: '40404040',
-        includeExts: ['.scss'],
-        excludeDirsRe: /1|2/,
-        logger: getUpdates
-      });
-
-      expect(updateText.length).to.equal(2); // _app.scss and _multi.scss
-      expect(updateText[0]).to.contain('.scss');
-
-      function checkLineDiffs (file, expectedDiffs) {
-        let diffLineCount = 0;
-        const cleanFileLines =
-          fs.readFileSync(path.join(workit, file), {encoding: 'utf8'}).split('\n');
-        const updatedFileLines =
-          fs.readFileSync(path.join(update, file), {encoding: 'utf8'}).split('\n');
-        expect(cleanFileLines.length).to.equal(updatedFileLines.length);
-        cleanFileLines.forEach((cleanLine, i) => {
-          if (cleanLine !== updatedFileLines[i]) {
-            diffLineCount++;
-          }
-        });
-        expect(diffLineCount).to.equal(expectedDiffs);
+    [
+      {
+        description: 'should update multiple lines if found',
+        checkLineArgs: [['_app.scss', 1], ['_multi.scss', 4]],
+        replacementFilter: null
+      },
+      {
+        description: 'should filter multiple lines if found',
+        checkLineArgs: [['_app.scss', 1], ['_multi.scss', 3]],
+        replacementFilter
       }
-
-      checkLineDiffs('_app.scss', 1);
-      checkLineDiffs('_multi.scss', 4);
+    ].forEach(args => {
+      it(args.description, () => {
+        picklr(update, {
+          action: 'update',
+          targetText: '39393939',
+          replacementText: '40404040',
+          replacementFilter: args.replacementFilter,
+          includeExts: ['.scss'],
+          excludeDirsRe: /1|2/,
+          logger: getUpdates
+        });
+  
+        expect(updateText.length).to.equal(2); // _app.scss and _multi.scss
+        expect(updateText[0]).to.contain('.scss');
+  
+        function checkLineDiffs (file, expectedDiffs) {
+          let diffLineCount = 0;
+          const cleanFileLines =
+            fs.readFileSync(path.join(workit, file), {encoding: 'utf8'}).split('\n');
+          const updatedFileLines =
+            fs.readFileSync(path.join(update, file), {encoding: 'utf8'}).split('\n');
+          expect(cleanFileLines.length).to.equal(updatedFileLines.length);
+          cleanFileLines.forEach((cleanLine, i) => {
+            if (cleanLine !== updatedFileLines[i]) {
+              diffLineCount++;
+            }
+          });
+          expect(diffLineCount).to.equal(expectedDiffs);
+        }
+  
+        args.checkLineArgs.forEach(argList => {
+          checkLineDiffs(...argList);
+        });
+      });
     });
   });
 });
