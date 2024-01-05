@@ -27,8 +27,8 @@ A brief description of the options that control file selection and processing:
     + `update` - Does the actual update on the files in place. Use only if you have version control.
   + `includeExts` - {Array} File extensions used to include files in processing. Must include the dot.
   + `excludeDirsRe` - {RegExp} A regular expression used to exclude directories from processing. A match is an exclusion.
-  + `targetText` - {String} The string used to identify the line to process.
-  + `replacementText` - {String} The string used to replace the `targetText`.
+  + `targetText` - {String|RegExp} Used to identify the line to process. First argument to `string.replace`.
+  + `replacementText` - {String|Function} Used to replace the `targetText`. Second argument to `string.replace`.
   + `replacementFilter` - {Function} A function to deny a specific replacement otherwise matched by `targetText`. Return true to allow the replacement to proceed as normal, false to deny it. If not supplied, defaults to all matched replacements allowed.  
     *signature:* **function (filePath, lineText): Boolean**  
   + `logger` - {Function} A log function to receive output. Defaults to `console.log`.
