@@ -228,6 +228,21 @@ describe('picklr', () => {
       expect(replaceText[0]).to.contain('9').and.not.contain('8');
     });
 
+    it('should report the proposed update, regexp', () => {
+      picklr(workit, {
+        action: 'audit',
+        targetText: /8+/,
+        replacementText: '9',
+        includeExts: ['.txt'],
+        logger: getAudits
+      });
+
+      expect(foundText.length).to.equal(1);
+      expect(replaceText.length).to.equal(1);
+      expect(foundText[0]).to.contain('88888888');
+      expect(replaceText[0]).to.contain('9').and.not.contain('8');
+    });
+
     it('should report omitted files', () => {
       picklr(workit, {
         action: 'audit',
@@ -333,19 +348,37 @@ describe('picklr', () => {
       {
         description: 'should update multiple lines if found',
         checkLineArgs: [['_app.scss', 1], ['_multi.scss', 4]],
-        replacementFilter: null
+        replacementFilter: null,
+        target: '39393939',
+        replace: '40404040'
+      },
+      {
+        description: 'should update multiple lines if found, regexp',
+        checkLineArgs: [['_app.scss', 1], ['_multi.scss', 4]],
+        replacementFilter: null,
+        target: /39+/,
+        replace: '40404040'
       },
       {
         description: 'should filter multiple lines if found',
         checkLineArgs: [['_app.scss', 1], ['_multi.scss', 3]],
-        replacementFilter
+        replacementFilter,
+        target: '39393939',
+        replace: '40404040'
+      },
+      {
+        description: 'should filter multiple lines if found, regexp',
+        checkLineArgs: [['_app.scss', 1], ['_multi.scss', 3]],
+        replacementFilter,
+        target: /39+/,
+        replace: '40404040'
       }
     ].forEach(args => {
       it(args.description, () => {
         picklr(update, {
           action: 'update',
-          targetText: '39393939',
-          replacementText: '40404040',
+          targetText: args.target,
+          replacementText: args.replace,
           replacementFilter: args.replacementFilter,
           includeExts: ['.scss'],
           excludeDirsRe: /1|2/,
