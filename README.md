@@ -6,13 +6,13 @@
 
 > "`Pick` `l`ine & `r`eplace"
 >
-> A simple, zero dependency, recursive, single-line text replacer.
+> A simple, zero dependency, recursive, text replacer.
 
-Use to update a specific, single line of text across multiple file types in a project.
-Finds just the **first** matching line in a file, and runs a text replacement on just that one line.
-Synchronous processing.
+Use to update a specific text across multiple file types in a project.
+Finds matching lines in files, based on text or regular expression, and runs a text replacement on just those lines matched*.  
+\* If you have special cases, you can supply a filter function to exclude those special cases.
 
-You might be reading this because you're in a pickle where you have to change a line across a big project. No worries, picklr allows you to test behavior prior to any updates with actions `echo` and `audit`. It's good to see what would happen prior to any file being updated, and also what files will get omitted from the change set.
+You might be reading this because you're in a pickle where you have to change a line or text pattern across a big project. No worries, picklr allows you to test replacement behavior prior to any updates with actions `echo` and `audit`. It's good to see what would happen prior to any file being updated across a project, and also what files will get omitted from the change set.
 
 ## API
 Picklr exports a single function that starts synchronous file processing when invoked.
@@ -21,17 +21,17 @@ Picklr exports a single function that starts synchronous file processing when in
 
 ### Options
 A brief description of the options that control file selection and processing:
-  + `action` - {String} `echo|audit|update` The action taken on each file. Defaults to `echo`. Use `echo` and `audit` actions to test the results of picklr with options prior to running `update`.
-    + `echo` - Just output what files could be affected by a change. Tests `includeExts` and `excludeDirsRe` options.
-    + `audit` - Must use with `targetText` and `replacementText`. Outputs lines found and the change plus any files that would be omitted. Tests `includeExts`, `excludeDirsRe`, `targetText` and `replacementText` options.
-    + `update` - Does the actual update on the files in place. Use only if you have version control.
-  + `includeExts` - {Array} File extensions used to include files in processing. Must include the dot.
-  + `excludeDirsRe` - {RegExp} A regular expression used to exclude directories from processing. A match is an exclusion.
-  + `targetText` - {String|RegExp} Used to identify the line to process. First argument to `string.replace`.
-  + `replacementText` - {String|Function} Used to replace the `targetText`. Second argument to `string.replace`.
-  + `replacementFilter` - {Function} A function to deny a specific replacement otherwise matched by `targetText`. Return true to allow the replacement to proceed as normal, false to deny it. If not supplied, defaults to all matched replacements allowed.  
+  + **action** - {String} `echo|audit|update` The action taken on each file. Defaults to `echo`. Use `echo` and `audit` actions to test the results of picklr with options prior to running `update`.
+    + **echo** - Just output what files could be affected by a change. Tests `includeExts` and `excludeDirsRe` options.
+    + **audit** - Must use with `targetText` and `replacementText`. Outputs lines found and the change plus any files that would be omitted. Tests `includeExts`, `excludeDirsRe`, `targetText` and `replacementText` options.
+    + **update** - Does the actual update on the files in place. Use only if you have version control.
+  + **includeExts** - {Array} File extensions used to include files in processing. Must include the dot.
+  + **excludeDirsRe** - {RegExp} A regular expression used to exclude directories from processing. A match is an exclusion.
+  + **targetText** - {String|RegExp} Used to identify the line to process. First argument to `string.replace`.
+  + **replacementText** - {String|Function} Used to replace the `targetText`. Second argument to `string.replace`.
+  + **replacementFilter** - {Function} A function to deny a specific replacement otherwise matched by `targetText`. Return true to allow the replacement to proceed as normal, false to deny it. If not supplied, defaults to all matched replacements allowed.  
     *signature:* **function (filePath, lineText): Boolean**  
-  + `logger` - {Function} A log function to receive output. Defaults to `console.log`.
+  + **logger** - {Function} A log function to receive output. Defaults to `console.log`.
 
 
 ## Example Usage
