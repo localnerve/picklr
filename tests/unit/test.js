@@ -4,8 +4,6 @@
  *
  * tests.
  */
-/* eslint-env node, mocha */
-/* eslint-disable no-console */
 import { expect } from 'chai';
 import { spawn } from 'child_process';
 import { default as path, dirname } from 'path';
