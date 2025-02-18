@@ -1,6 +1,6 @@
 {
   "name": "picklr",
-  "version": "0.12.3",
+  "version": "0.12.4",
   "description": "A utility to update a single line in multiple files",
   "main": "index.js",
   "type": "module",
@@ -37,9 +37,9 @@
   "devDependencies": {
     "@eslint/js": "^9.20.0",
     "c8": "^10.1.3",
-    "chai": "^5.1.2",
-    "eslint": "^9.20.0",
-    "globals": "^15.14.0",
+    "chai": "^5.2.0",
+    "eslint": "^9.20.1",
+    "globals": "^15.15.0",
     "mocha": "^11.1.0",
     "precommit-hook": "^3.0.0"
   },
