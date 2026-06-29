@@ -10,21 +10,22 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [20.x, 22.x, 24.x]
+        node-version: [22.x, 24.x, 26.x]
         # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
 
     steps:
-    - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # 6.0.1
+    - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # 7.0.0
     - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@395ad3262231945c25e8478fd5baf05154b1d79f # 6.1.0
+      uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # 6.4.0
       with:
         node-version: ${{ matrix.node-version }}
     - run: npm ci
     - name: Lint, Test, And Coverage
-      run: npm run lint && npm run cover
+      run: npm run lint && npm test
     - name: Coverage Upload
       if: ${{ success() }}
-      uses: coverallsapp/github-action@master
+      uses: coverallsapp/github-action@5cbfd81b66ca5d10c19b062c04de0199c215fb6e # 2.3.7
       with:
         github-token: ${{ secrets.GITHUB_TOKEN }}
-        path-to-lcov: ./reports/coverage/lcov.info
+        path-to-lcov: ./coverage/lcov.info
+        fail-on-error: false

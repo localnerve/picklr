@@ -1,6 +1,6 @@
 .DS_Store
 .github
-reports
 tmp
 tests
-.jshint*
+eslint.config.js
+coverage

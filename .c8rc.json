@@ -1,5 +1,0 @@
-{
-  "reporter": ["lcov", "json"],
-  "reports-dir": "reports/coverage",
-  "exclude": ["tmp", "reports", "node_modules", "tests", ".github"]
-}

@@ -1,6 +1,6 @@
 {
   "name": "picklr",
-  "version": "0.13.3",
+  "version": "0.14.0",
   "description": "A utility to update a single line in multiple files",
   "main": "index.js",
   "type": "module",
@@ -10,10 +10,8 @@
   },
   "scripts": {
     "lint": "eslint .",
-    "test": "mocha tests/unit --recursive --reporter spec",
-    "test:debug": "mocha tests/unit --recursive --reporter spec --node-option inspect-brk",
-    "cover": "c8 -- npm test",
-    "validate": "npm ls"
+    "pretest": "node -e \"require('fs').rmSync('./coverage',{force:true,recursive:true});require('fs').mkdirSync('./coverage',{recursive:true});\"",
+    "test": "node --test --test-concurrency=1 --experimental-test-coverage --test-reporter=spec --test-reporter-destination=stdout --test-reporter=lcov --test-reporter-destination=./coverage/lcov.info tests/unit/**"
   },
   "repository": {
     "type": "git",
@@ -36,17 +34,20 @@
   "homepage": "https://github.com/localnerve/picklr#readme",
   "devDependencies": {
     "@eslint/js": "^10.0.1",
-    "c8": "^11.0.0",
-    "chai": "^6.2.2",
-    "eslint": "^10.1.0",
-    "globals": "^17.4.0",
-    "mocha": "^11.7.5"
+    "eslint": "^10.6.0",
+    "globals": "^17.7.0"
   },
-  "overrides": {
-    "serialize-javascript": "^7.0.4",
-    "diff": "^8.0.3"
-  },
+  "funding": [
+    {
+      "type": "github",
+      "url": "https://github.com/sponsors/localnerve"
+    },
+    {
+      "type": "paypal",
+      "url": "https://www.paypal.com/ncp/payment/DHCB5GUYMGX5U"
+    }
+  ],
   "engines": {
-    "node": ">= 20"
+    "node": ">= 22"
   }
 }
