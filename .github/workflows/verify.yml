@@ -21,10 +21,11 @@ jobs:
         node-version: ${{ matrix.node-version }}
     - run: npm ci
     - name: Lint, Test, And Coverage
-      run: npm run lint && npm run test:cover
+      run: npm run lint && npm test
     - name: Coverage Upload
       if: ${{ success() }}
-      uses: coverallsapp/github-action@master
+      uses: coverallsapp/github-action@5cbfd81b66ca5d10c19b062c04de0199c215fb6e # 2.3.7
       with:
         github-token: ${{ secrets.GITHUB_TOKEN }}
-        path-to-lcov: ./reports/coverage/lcov.info
+        path-to-lcov: ./coverage/lcov.info
+        fail-on-error: false

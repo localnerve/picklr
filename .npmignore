@@ -1,7 +1,6 @@
 .DS_Store
 .github
-reports
 tmp
 tests
 eslint.config.js
-.c8rc.json
+coverage

@@ -10,8 +10,8 @@
   },
   "scripts": {
     "lint": "eslint .",
-    "test": "node --test --test-concurrency=1 tests/unit/**",
-    "test:cover": "c8 -- npm test"
+    "pretest": "node -e \"require('fs').rmSync('./coverage',{force:true,recursive:true});require('fs').mkdirSync('./coverage',{recursive:true});\"",
+    "test": "node --test --test-concurrency=1 --experimental-test-coverage --test-reporter=spec --test-reporter-destination=stdout --test-reporter=lcov --test-reporter-destination=./coverage/lcov.info tests/unit/**"
   },
   "repository": {
     "type": "git",
@@ -34,7 +34,6 @@
   "homepage": "https://github.com/localnerve/picklr#readme",
   "devDependencies": {
     "@eslint/js": "^10.0.1",
-    "c8": "^11.0.0",
     "eslint": "^10.6.0",
     "globals": "^17.7.0"
   },

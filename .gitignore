@@ -8,3 +8,4 @@ npm-debug.log
 package
 *.tgz
 .DS_Store
+coverage
