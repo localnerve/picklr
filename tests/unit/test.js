@@ -4,14 +4,14 @@
  *
  * tests.
  */
-import { expect } from 'chai';
-import { spawn } from 'child_process';
-import { default as path, dirname } from 'path';
-import { fileURLToPath } from 'url';
-import fs from 'fs';
+import { describe, it, beforeEach, afterEach, before, after } from 'node:test';
+import assert from 'node:assert';
+import { spawn } from 'node:child_process';
+import path from 'node:path';
+import * as fs from 'node:fs';
 import picklr from '../../lib/picklr.js';
 
-const __dirname = dirname(fileURLToPath(import.meta.url));
+const __dirname = import.meta.dirname;
 
 describe('picklr', () => {
   const startDir = path.join(__dirname, '../fixtures'),
@@ -106,7 +106,7 @@ describe('picklr', () => {
         logger: getCounts
       });
 
-      expect(totalCount).to.equal(totalJSFiles);
+      assert.strictEqual(totalCount, totalJSFiles);
     });
 
     describe('includeExts', () => {
@@ -116,7 +116,7 @@ describe('picklr', () => {
           logger: getCounts
         });
 
-        expect(totalCount).to.equal(totalSCSSFiles);
+        assert.strictEqual(totalCount, totalSCSSFiles);
       });
 
       it('should count only jsx and scss files', () => {
@@ -125,7 +125,7 @@ describe('picklr', () => {
           logger: getCounts
         });
 
-        expect(totalCount).to.equal(totalJSXFiles + totalSCSSFiles);
+        assert.strictEqual(totalCount, totalJSXFiles + totalSCSSFiles);
       });
 
       it('should count all fixture files', () => {
@@ -134,7 +134,7 @@ describe('picklr', () => {
           logger: getCounts
         });
 
-        expect(totalCount).to.equal(totalJSFiles + totalJSXFiles + totalSCSSFiles);
+        assert.strictEqual(totalCount, totalJSFiles + totalJSXFiles + totalSCSSFiles);
       });
     });
 
@@ -148,7 +148,7 @@ describe('picklr', () => {
           logger: getCounts
         });
 
-        expect(totalCount).to.equal(totalJSFilesWoWorkit);
+        assert.strictEqual(totalCount, totalJSFilesWoWorkit);
       });
 
       it('should exclude a directory recursively', () => {
@@ -158,7 +158,7 @@ describe('picklr', () => {
           logger: getCounts
         });
 
-        expect(totalCount).to.equal(3);
+        assert.strictEqual(totalCount, 3);
       });
 
       it('should exclude multiple directories', () => {
@@ -168,7 +168,7 @@ describe('picklr', () => {
           logger: getCounts
         });
 
-        expect(totalCount).to.equal(1);
+        assert.strictEqual(totalCount, 1);
       });
     });
   });
@@ -177,20 +177,26 @@ describe('picklr', () => {
     const workit = path.join(startDir, 'files', 'workit');
     const backup = path.join(startDir, 'files', 'workitbackup');
 
-    before('audit', (done) => {
-      const cp = spawn('cp', ['-r', workit, backup]);
-      cp.on('close', (code) => {
-        let exists = false, stats;
-        if (code === 0) {
-          stats = fs.statSync(backup);
-          exists = stats && stats.isDirectory();
-        }
-        done(code === 0 && exists ? null : new Error('cp failed, code '+ code));
+    before(() => {
+      return new Promise((resolve, reject) => {
+        const cp = spawn('cp', ['-r', workit, backup]);
+        cp.on('close', code => {
+          let exists = false, stats;
+          if (code === 0) {
+            stats = fs.statSync(backup);
+            exists = stats && stats.isDirectory();
+          }
+          if (code === 0 && exists) {
+            resolve();
+          } else {
+            reject(new Error(`cp failed, code ${code}`));
+          }
+        });
       });
     });
 
-    after('audit', (done) => {
-      fs.rm(backup, { recursive: true, force: true }, done);
+    after(() => {
+      return fs.promises.rm(backup, { recursive: true, force: true });
     });
 
     it('should not update files', () => {
@@ -201,14 +207,14 @@ describe('picklr', () => {
         logger: getCounts
       });
 
-      expect(totalCount).to.equal(1);
-      expect(matchedCount).to.equal(1);
+      assert.strictEqual(totalCount, 1);
+      assert.strictEqual(matchedCount, 1);
 
       const auditedFile =
         fs.readFileSync(path.join(workit, 'sentinel.txt'), {encoding: 'utf8'});
       const cleanFile =
         fs.readFileSync(path.join(backup, 'sentinel.txt'), {encoding: 'utf8'});
-      expect(auditedFile).to.equal(cleanFile);
+      assert.strictEqual(auditedFile, cleanFile);
     });
 
     it('should report the proposed update', () => {
@@ -220,10 +226,11 @@ describe('picklr', () => {
         logger: getAudits
       });
 
-      expect(foundText.length).to.equal(1);
-      expect(replaceText.length).to.equal(1);
-      expect(foundText[0]).to.contain('88888888');
-      expect(replaceText[0]).to.contain('9').and.not.contain('8');
+      assert.strictEqual(foundText.length, 1);
+      assert.strictEqual(replaceText.length, 1);
+      assert.match(foundText[0], /88888888/);
+      assert.match(replaceText[0], /9/);
+      assert.match(replaceText[0], /^[^8]*$/);
     });
 
     it('should report the proposed update, regexp', () => {
@@ -235,10 +242,11 @@ describe('picklr', () => {
         logger: getAudits
       });
 
-      expect(foundText.length).to.equal(1);
-      expect(replaceText.length).to.equal(1);
-      expect(foundText[0]).to.contain('88888888');
-      expect(replaceText[0]).to.contain('9').and.not.contain('8');
+      assert.strictEqual(foundText.length, 1);
+      assert.strictEqual(replaceText.length, 1);
+      assert.match(foundText[0], /88888888/);
+      assert.match(replaceText[0], /9/);
+      assert.match(replaceText[0], /^[^8]*$/);
     });
 
     it('should report omitted files', () => {
@@ -251,12 +259,13 @@ describe('picklr', () => {
         logger: getAudits
       });
 
-      expect(foundText.length).to.equal(1);
-      expect(replaceText.length).to.equal(1);
-      expect(omitText.length).to.equal(2); // 2 scss files without 88888888
-      expect(foundText[0]).to.contain('88888888');
-      expect(replaceText[0]).to.contain('9').and.not.contain('8');
-      expect(omitText[0]).to.contain('.scss');
+      assert.strictEqual(foundText.length, 1);
+      assert.strictEqual(replaceText.length, 1);
+      assert.strictEqual(omitText.length, 2); // 2 scss files without 88888888
+      assert.match(foundText[0], /88888888/);
+      assert.match(replaceText[0], /9/);
+      assert.match(replaceText[0], /^[^8]*$/);
+      assert.match(omitText[0], /\.scss/);
     });
 
     [
@@ -283,11 +292,11 @@ describe('picklr', () => {
         });
   
         const expected = args.expected;
-        expect(foundLines.length).to.equal(2); // two scss files
+        assert.strictEqual(foundLines.length, 2); // two scss files
         foundLines.forEach(foundLine => {
           const file = path.parse(foundLine.path).base;
           const expectedLines = expected[file];
-          expect(expectedLines).to.equal(foundLine.lines);
+          assert.strictEqual(expectedLines, foundLine.lines);
         });
       });
     });
@@ -297,20 +306,26 @@ describe('picklr', () => {
     const workit = path.join(startDir, 'files', 'workit');
     const update = path.join(startDir, 'files', 'workitupdate');
 
-    beforeEach('update', (done) => {
-      const cp = spawn('cp', ['-r', workit, update]);
-      cp.on('close', (code) => {
-        let exists = false, stats;
-        if (code === 0) {
-          stats = fs.statSync(update);
-          exists = stats && stats.isDirectory();
-        }
-        done(code === 0 && exists ? null : new Error('cp failed, code '+ code));
+    beforeEach(() => {
+      return new Promise((resolve, reject) => {
+        const cp = spawn('cp', ['-r', workit, update]);
+        cp.on('close', code => {
+          let exists = false, stats;
+          if (code === 0) {
+            stats = fs.statSync(update);
+            exists = stats && stats.isDirectory();
+          }
+          if (code === 0 && exists) {
+            resolve();
+          } else {
+            reject(new Error(`cp failed, code ${code}`));
+          }
+        });
       });
     });
 
-    afterEach('update', (done) => {
-      fs.rm(update, { recursive: true, force: true }, done);
+    afterEach(() => {
+      return fs.promises.rm(update, { recursive: true, force: true });
     });
 
     it('should update only the found file', () => {
@@ -325,21 +340,23 @@ describe('picklr', () => {
         logger: getUpdates
       });
 
-      expect(updateText.length).to.equal(1);
-      expect(updateText[0]).to.contain('.txt').and.not.contain('.scss');
+      assert.strictEqual(updateText.length, 1);
+      assert.match(updateText[0], /\.txt/);
+      assert.match(updateText[0], /^(?!.*\.scss).*$/);
 
       cleanFile =
         fs.readFileSync(path.join(workit, '_app.scss'), {encoding: 'utf8'});
       shouldBeCleanFile =
         fs.readFileSync(path.join(update, '_app.scss'), {encoding: 'utf8'});
-      expect(cleanFile).to.equal(shouldBeCleanFile);
+      assert.strictEqual(cleanFile, shouldBeCleanFile);
 
       cleanFile =
         fs.readFileSync(path.join(workit, 'sentinel.txt'), {encoding: 'utf8'});
       const updatedFile =
         fs.readFileSync(path.join(update, 'sentinel.txt'), {encoding: 'utf8'});
-      expect(cleanFile).to.not.equal(updatedFile);
-      expect(updatedFile).to.contain('9').and.not.contain('8');
+      assert.notStrictEqual(cleanFile, updatedFile);
+      assert.match(updatedFile, /9/);
+      assert.doesNotMatch(updatedFile, /8/);
     });
 
     [
@@ -383,8 +400,8 @@ describe('picklr', () => {
           logger: getUpdates
         });
   
-        expect(updateText.length).to.equal(2); // _app.scss and _multi.scss
-        expect(updateText[0]).to.contain('.scss');
+        assert.strictEqual(updateText.length, 2); // _app.scss and _multi.scss
+        assert.match(updateText[0], /\.scss/);
   
         function checkLineDiffs (file, expectedDiffs) {
           let diffLineCount = 0;
@@ -392,13 +409,13 @@ describe('picklr', () => {
             fs.readFileSync(path.join(workit, file), {encoding: 'utf8'}).split('\n');
           const updatedFileLines =
             fs.readFileSync(path.join(update, file), {encoding: 'utf8'}).split('\n');
-          expect(cleanFileLines.length).to.equal(updatedFileLines.length);
+          assert.strictEqual(cleanFileLines.length, updatedFileLines.length);
           cleanFileLines.forEach((cleanLine, i) => {
             if (cleanLine !== updatedFileLines[i]) {
               diffLineCount++;
             }
           });
-          expect(diffLineCount).to.equal(expectedDiffs);
+          assert.strictEqual(diffLineCount, expectedDiffs);
         }
   
         args.checkLineArgs.forEach(argList => {

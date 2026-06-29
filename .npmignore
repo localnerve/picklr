@@ -3,4 +3,5 @@
 reports
 tmp
 tests
-.jshint*
+eslint.config.js
+.c8rc.json

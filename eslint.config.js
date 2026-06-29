@@ -9,20 +9,13 @@ export default [{
     'tests/fixtures/**'
   ]
 }, {
-  ...js.configs.recommended,
-  languageOptions: {
-    globals: {
-      ...globals.node
-    }
-  }
-}, {
   files: [
-    'tests/**'
+    '**/*.js'
   ],
   ...js.configs.recommended,
   languageOptions: {
     globals: {
-      ...globals.mocha
+      ...globals.node
     }
   }
 }];
