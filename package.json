@@ -1,6 +1,6 @@
 {
   "name": "picklr",
-  "version": "0.14.0",
+  "version": "0.14.1",
   "description": "A utility to update a single line in multiple files",
   "main": "index.js",
   "type": "module",
@@ -34,7 +34,7 @@
   "homepage": "https://github.com/localnerve/picklr#readme",
   "devDependencies": {
     "@eslint/js": "^10.0.1",
-    "eslint": "^10.6.0",
+    "eslint": "^10.7.0",
     "globals": "^17.7.0"
   },
   "funding": [
