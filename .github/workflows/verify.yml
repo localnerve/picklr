@@ -21,7 +21,9 @@ jobs:
         node-version: ${{ matrix.node-version }}
     - run: npm ci
     - name: Lint, Test, And Coverage
-      run: npm run lint && npm test
+      run: |
+        npm run lint
+        npm test
     - name: Coverage Upload
       if: ${{ success() }}
       uses: coverallsapp/github-action@8d6379e14d29928660c4ba802d8e85393440b329 # 2.3.8
